@@ -758,6 +758,7 @@ function updateDashboard() {
     document.getElementById('progressText').textContent = progress.toFixed(1) + '%';
 
     updateTrendAnalysis(dailySeries, totalSales, totalDays, expectedToDate);
+    updateLeaderboard(yearData);
     updateChart(dailySeries);
     updateTable(dailySeries);
 }
@@ -930,6 +931,61 @@ function updateChart(dailySeries) {
     });
 }
 
+function updateLeaderboard(yearData) {
+    const el = document.getElementById('leaderboardList');
+    const yearEl = document.getElementById('leaderboardYear');
+    if (!el) return;
+
+    if (yearEl) yearEl.textContent = targetYear;
+
+    // Aggregate lineTotal by accountName across all orders
+    const dealerMap = {};
+    yearData.forEach(function(entry) {
+        if (!Array.isArray(entry.orders)) return;
+        entry.orders.forEach(function(order) {
+            const name = (order.accountName || '').trim();
+            if (!name) return;
+            dealerMap[name] = (dealerMap[name] || 0) + (order.lineTotal || 0);
+        });
+    });
+
+    const dealers = Object.keys(dealerMap).map(function(name) {
+        return { name: name, revenue: dealerMap[name] };
+    }).sort(function(a, b) { return b.revenue - a.revenue; });
+
+    if (dealers.length === 0) {
+        el.innerHTML = '<p class="no-data">No dealer data yet.</p>';
+        return;
+    }
+
+    const top10 = dealers.slice(0, 10);
+    const grandTotal = dealers.reduce(function(sum, d) { return sum + d.revenue; }, 0);
+    const maxRevenue = top10[0].revenue;
+
+    let html = '';
+    top10.forEach(function(dealer, idx) {
+        const pct = grandTotal > 0 ? (dealer.revenue / grandTotal * 100) : 0;
+        const barWidth = maxRevenue > 0 ? (dealer.revenue / maxRevenue * 100) : 0;
+        const rank = idx + 1;
+        const medalClass = rank === 1 ? ' rank-gold' : rank === 2 ? ' rank-silver' : rank === 3 ? ' rank-bronze' : '';
+
+        html +=
+            '<div class="lb-row">' +
+                '<div class="lb-rank' + medalClass + '">' + rank + '</div>' +
+                '<div class="lb-info">' +
+                    '<div class="lb-name-row">' +
+                        '<button class="lb-name dealer-link" data-dealer="' + escapeAttr(dealer.name) + '" onclick="filterByDealer(this.dataset.dealer)">' + escapeHtml(dealer.name) + '</button>' +
+                        '<span class="lb-pct">' + pct.toFixed(1) + '%</span>' +
+                        '<span class="lb-revenue">' + formatCurrency(dealer.revenue) + '</span>' +
+                    '</div>' +
+                    '<div class="lb-bar-track"><div class="lb-bar" style="width:' + barWidth.toFixed(1) + '%"></div></div>' +
+                '</div>' +
+            '</div>';
+    });
+
+    el.innerHTML = html;
+}
+
 function updateTable(dailySeries) {
     const tableBody = document.getElementById('salesTableBody');
 
@@ -938,37 +994,92 @@ function updateTable(dailySeries) {
         return;
     }
 
-    let html = '';
+    const now = new Date();
+    const currentMonthKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+
+    // Group entries by month (newest first)
+    const monthMap = {};
+    const monthOrder = [];
 
     for (let i = dailySeries.length - 1; i >= 0; i--) {
         const entry = dailySeries[i];
-        const sourceEntry = salesData.find(function(row) {
-            return row.date === entry.date;
-        });
-        const originalIndex = sourceEntry ? salesData.findIndex(function(row) { return row.date === entry.date; }) : -1;
+        const d = new Date(entry.date + 'T12:00:00');
+        const monthKey = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
 
-        const cumulativeUpToHere = dailySeries.slice(0, i + 1).reduce(function(sum, row) {
-            return sum + row.amount;
-        }, 0);
-
-        const actionCell = originalIndex !== -1
-            ? '<button class="delete-btn" onclick="deleteSales(' + originalIndex + ')">Delete</button>'
-            : '<span class="no-data">--</span>';
-        const detailsCell = sourceEntry && Array.isArray(sourceEntry.orders) && sourceEntry.orders.length > 0
-            ? '<button class="details-btn" data-date="' + entry.date + '" onclick="showReportDetails(this.dataset.date)">View</button>'
-            : '<span class="no-data">--</span>';
-
-        html +=
-            '<tr>' +
-            '<td>' + formatDate(entry.date) + '</td>' +
-            '<td>' + formatCurrency(entry.amount) + '</td>' +
-            '<td>' + formatCurrency(cumulativeUpToHere) + '</td>' +
-            '<td>' + actionCell + '</td>' +
-            '<td>' + detailsCell + '</td>' +
-            '</tr>';
+        if (!monthMap[monthKey]) {
+            monthMap[monthKey] = { entries: [], date: d };
+            monthOrder.push(monthKey);
+        }
+        monthMap[monthKey].entries.push({ entry: entry, seriesIndex: i });
     }
 
+    let html = '';
+
+    monthOrder.forEach(function(monthKey) {
+        const monthData = monthMap[monthKey];
+        const isCurrentMonth = monthKey === currentMonthKey;
+        const isCollapsed = !isCurrentMonth;
+
+        const monthTotal = monthData.entries.reduce(function(sum, item) { return sum + item.entry.amount; }, 0);
+        const daysWithSales = monthData.entries.filter(function(item) { return item.entry.amount > 0; }).length;
+        const dailyAvg = daysWithSales > 0 ? monthTotal / daysWithSales : 0;
+        const weeklyAvg = dailyAvg * 5;
+
+        const monthLabel = monthData.date.toLocaleString('default', { month: 'long', year: 'numeric' });
+        const icon = isCollapsed ? '&#9654;' : '&#9660;';
+        const rowCount = monthData.entries.length;
+
+        html += '<tr class="month-header' + (isCollapsed ? ' collapsed' : '') + '" data-month="' + monthKey + '" onclick="toggleMonth(\'' + monthKey + '\')">' +
+            '<td><span class="month-toggle">' + icon + '</span> ' + monthLabel + ' <span class="month-day-count">(' + rowCount + ' day' + (rowCount !== 1 ? 's' : '') + ')</span></td>' +
+            '<td class="month-total">' + formatCurrency(monthTotal) + '</td>' +
+            '<td><span class="month-stat">Day avg: ' + formatCurrency(dailyAvg) + '</span><span class="month-stat">Wk avg: ' + formatCurrency(weeklyAvg) + '</span></td>' +
+            '<td></td>' +
+            '<td></td>' +
+            '</tr>';
+
+        monthData.entries.forEach(function(item) {
+            const entry = item.entry;
+            const i = item.seriesIndex;
+            const sourceEntry = salesData.find(function(row) { return row.date === entry.date; });
+            const originalIndex = sourceEntry ? salesData.findIndex(function(row) { return row.date === entry.date; }) : -1;
+
+            const cumulativeUpToHere = dailySeries.slice(0, i + 1).reduce(function(sum, row) { return sum + row.amount; }, 0);
+
+            const actionCell = originalIndex !== -1
+                ? '<button class="delete-btn" onclick="deleteSales(' + originalIndex + ')">Delete</button>'
+                : '<span class="no-data">--</span>';
+            const detailsCell = sourceEntry && Array.isArray(sourceEntry.orders) && sourceEntry.orders.length > 0
+                ? '<button class="details-btn" data-date="' + entry.date + '" onclick="showReportDetails(this.dataset.date)">View</button>'
+                : '<span class="no-data">--</span>';
+
+            html += '<tr class="month-row" data-month="' + monthKey + '"' + (isCollapsed ? ' style="display:none"' : '') + '>' +
+                '<td class="day-row-date">' + formatDate(entry.date) + '</td>' +
+                '<td>' + formatCurrency(entry.amount) + '</td>' +
+                '<td>' + formatCurrency(cumulativeUpToHere) + '</td>' +
+                '<td>' + actionCell + '</td>' +
+                '<td>' + detailsCell + '</td>' +
+                '</tr>';
+        });
+    });
+
     tableBody.innerHTML = html;
+}
+
+function toggleMonth(monthKey) {
+    const header = document.querySelector('.month-header[data-month="' + monthKey + '"]');
+    const rows = document.querySelectorAll('.month-row[data-month="' + monthKey + '"]');
+    const isCollapsed = header.classList.contains('collapsed');
+    const toggle = header.querySelector('.month-toggle');
+
+    if (isCollapsed) {
+        header.classList.remove('collapsed');
+        toggle.innerHTML = '&#9660;';
+        rows.forEach(function(r) { r.style.display = ''; });
+    } else {
+        header.classList.add('collapsed');
+        toggle.innerHTML = '&#9654;';
+        rows.forEach(function(r) { r.style.display = 'none'; });
+    }
 }
 
 function showReportDetails(dateStr) {

@@ -318,6 +318,114 @@ button:active {
     color: var(--text);
 }
 
+/* Dealer Leaderboard */
+.leaderboard-section {
+    margin-bottom: 28px;
+}
+
+.leaderboard-section h2 {
+    margin-bottom: 16px;
+    color: var(--card-dark);
+}
+
+.leaderboard-year {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6em;
+    font-weight: 400;
+    color: var(--muted);
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+.lb-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: #FAF6F1;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin-bottom: 6px;
+}
+
+.lb-rank {
+    font-family: var(--font-serif);
+    font-size: 1.1em;
+    font-weight: 700;
+    color: var(--muted);
+    width: 26px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.lb-rank.rank-gold   { color: #B8892A; }
+.lb-rank.rank-silver { color: #8A9199; }
+.lb-rank.rank-bronze { color: #9C6140; }
+
+.lb-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.lb-name-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.lb-name {
+    font-weight: 600;
+    font-size: 0.92em;
+    color: var(--primary);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 280px;
+}
+
+.lb-name:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+    transform: none;
+    box-shadow: none;
+    background: none;
+}
+
+.lb-pct {
+    font-size: 0.8em;
+    color: var(--muted);
+    flex-shrink: 0;
+}
+
+.lb-revenue {
+    font-family: var(--font-serif);
+    font-size: 0.95em;
+    font-weight: 600;
+    color: var(--text);
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.lb-bar-track {
+    height: 4px;
+    background: var(--line);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.lb-bar {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+}
+
 .charts-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -399,6 +507,56 @@ tbody tr:hover {
     text-align: center;
     color: var(--muted);
     font-style: italic;
+}
+
+.month-header {
+    background: var(--bg-2) !important;
+    cursor: pointer;
+    user-select: none;
+    border-top: 2px solid var(--line);
+}
+
+.month-header:hover {
+    background: #DDD5C8 !important;
+}
+
+.month-header td {
+    font-weight: 600;
+    color: var(--text);
+    padding: 11px 13px;
+}
+
+.month-header .month-total {
+    font-family: var(--font-serif);
+    font-size: 1.05em;
+    color: var(--primary);
+}
+
+.month-toggle {
+    display: inline-block;
+    font-size: 0.7em;
+    color: var(--muted);
+    margin-right: 4px;
+    transition: transform 0.15s;
+}
+
+.month-day-count {
+    font-weight: 400;
+    font-size: 0.85em;
+    color: var(--muted);
+    margin-left: 4px;
+}
+
+.month-stat {
+    display: inline-block;
+    font-size: 0.82em;
+    font-weight: 400;
+    color: var(--muted);
+    margin-right: 12px;
+}
+
+.month-row td:first-child {
+    padding-left: 28px;
 }
 
 .delete-btn {
