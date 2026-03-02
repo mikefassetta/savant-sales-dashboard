@@ -693,7 +693,7 @@ function publishSharedData() {
     a.click();
     window.URL.revokeObjectURL(url);
 
-    alert('shared-data.json downloaded! Move it into your project folder, then commit and push to GitHub to update the team view.');
+    alert('shared-data.json downloaded to your Downloads folder!\n\n1. Move it to:\n   Documents > Code projects > Savant dashboard\n\n2. Then in Terminal run:\n   git add shared-data.json && git commit -m "Update sales data" && git push');
 }
 
 function clearAllData() {
