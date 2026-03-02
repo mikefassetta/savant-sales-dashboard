@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# Savant daily report files (raw data — don't publish)
+SavantDailyOrder*.xlsx
+
+# Old/unused files
+sales-dashboard.html
+index.html
+app.js
+styles.css
+test.html
+sales-dashboard-hosted/

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savant Sales Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="sales-dashboard-v2.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div id="snapshotSection">
+        <header>
+            <h1>Savant Sales Dashboard</h1>
+            <p class="subtitle">Drop daily reports, track quota pace, and stay on target.</p>
+            <p class="snapshot-asof" id="dataAsOf">Data current through --</p>
+        </header>
+
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card kpi-card" data-kpi="totalSales" draggable="true">
+                <h3>Total Sales</h3>
+                <p class="stat-value" id="totalSales">$0</p>
+            </div>
+            <div class="stat-card kpi-card" data-kpi="goalDisplay" draggable="true">
+                <h3>Annual Goal</h3>
+                <p class="stat-value" id="goalDisplay">$100,000</p>
+            </div>
+            <div class="stat-card kpi-card" data-kpi="progressPercent" draggable="true">
+                <h3>Progress</h3>
+                <p class="stat-value" id="progressPercent">0%</p>
+            </div>
+            <div class="stat-card kpi-card" data-kpi="remaining" draggable="true">
+                <h3>Remaining</h3>
+                <p class="stat-value" id="remaining">$100,000</p>
+            </div>
+            <div class="stat-card accent kpi-card" data-kpi="requiredDaily" draggable="true">
+                <h3>Needed / Day</h3>
+                <p class="stat-value" id="requiredDaily">$0</p>
+            </div>
+            <div class="stat-card accent kpi-card" data-kpi="currentDailyPace" draggable="true">
+                <h3>Current Daily Pace</h3>
+                <p class="stat-value" id="currentDailyPace">$0</p>
+            </div>
+            <div class="stat-card accent kpi-card" data-kpi="expectedYtd" draggable="true">
+                <h3>Expected YTD Today</h3>
+                <p class="stat-value" id="expectedYtd">$0</p>
+            </div>
+            <div class="stat-card accent kpi-card" data-kpi="paceStatus" draggable="true">
+                <h3>Pace Status</h3>
+                <p class="stat-value" id="paceStatus">--</p>
+            </div>
+        </div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar">
+                <span id="progressText">0%</span>
+            </div>
+        </div>
+
+        <div class="trend-section">
+            <h2>Trend Analysis</h2>
+            <div class="trend-stats">
+                <div class="trend-card">
+                    <p class="trend-label">Daily Average</p>
+                    <p class="trend-value" id="dailyAvg">$0</p>
+                </div>
+                <div class="trend-card">
+                    <p class="trend-label">Projected Total</p>
+                    <p class="trend-value" id="projected">$0</p>
+                </div>
+                <div class="trend-card">
+                    <p class="trend-label">Days Tracked</p>
+                    <p class="trend-value" id="daysTracked">0</p>
+                </div>
+                <div class="trend-card">
+                    <p class="trend-label">Pace Gap (YTD)</p>
+                    <p class="trend-value" id="paceGap">$0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h2 class="chart-title">Daily Sales</h2>
+                <canvas id="dailySalesChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2 class="chart-title">Tracking Lines</h2>
+                <canvas id="trackingChart"></canvas>
+            </div>
+        </div>
+        </div>
+
+        <div class="data-table-section">
+            <h2>Sales History</h2>
+            <button onclick="clearAllData()" class="clear-btn">Clear All Data</button>
+            <button onclick="exportData('csv')" class="export-btn">Export CSV</button>
+            <button onclick="exportData('excel')" class="export-btn">Export Excel</button>
+            <button onclick="createSnapshot()" class="export-btn">Create Snapshot</button>
+            <button onclick="publishSharedData()" class="publish-btn">Publish for Team</button>
+            <table id="salesTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Cumulative</th>
+                        <th>Action</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody id="salesTableBody">
+                    <tr>
+                        <td colspan="5" class="no-data">No sales data yet. Add your first entry above!</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="controls">
+            <div class="goal-section">
+                <label for="salesGoal">Annual Goal ($):</label>
+                <input type="number" id="salesGoal" placeholder="Enter annual goal" value="1000000">
+                <label for="targetYear">Year:</label>
+                <input type="number" id="targetYear" placeholder="YYYY">
+                <button onclick="updateGoal()">Save Goal</button>
+            </div>
+
+            <div class="upload-section">
+                <label for="dailySales">Add Daily Sales ($):</label>
+                <input type="date" id="salesDate">
+                <input type="number" id="dailySales" placeholder="Enter sales amount">
+                <button onclick="addSales()">Add Sales</button>
+            </div>
+
+            <div class="file-upload-section">
+                <label>Upload Daily Reports:</label>
+                <div class="drop-zone" id="dropZone">
+                    <p class="drop-title">Drag and drop daily report files here</p>
+                    <p class="drop-subtitle">or click to browse</p>
+                    <input type="file" id="dataFile" accept=".csv,.xlsx,.xls" multiple>
+                </div>
+                <p id="uploadStatus" class="upload-status" aria-live="polite"></p>
+                <small>Supports Savant daily reports and standard date/amount CSV or Excel files.</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="reportModal" aria-hidden="true">
+        <div class="modal-panel">
+            <div class="modal-header">
+                <h3 id="reportModalTitle">Daily Report Details</h3>
+                <button type="button" class="modal-close" onclick="closeReportModal()">Close</button>
+            </div>
+            <div class="modal-body" id="reportModalBody"></div>
+        </div>
+    </div>
+
+    <script src="sales-dashboard-v2.js"></script>
+</body>
+</html>
