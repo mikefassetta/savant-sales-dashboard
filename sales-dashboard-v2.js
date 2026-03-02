@@ -604,6 +604,39 @@ function createSnapshot() {
     });
 }
 
+// ── Admin panel ────────────────────────────────────────────────
+var ADMIN_PASSWORD = 'savant2026';   // ← change this to whatever you want
+var adminUnlocked = false;
+
+function toggleAdminPanel() {
+    if (adminUnlocked) {
+        lockAdminPanel();
+        return;
+    }
+    var pwd = prompt('Enter admin password:');
+    if (pwd === null) return;        // cancelled
+    if (pwd === ADMIN_PASSWORD) {
+        adminUnlocked = true;
+        var panel = document.getElementById('adminPanel');
+        var btn   = document.getElementById('adminLockBtn');
+        panel.classList.add('open');
+        btn.textContent = '🔓 Admin';
+        btn.classList.add('unlocked');
+    } else {
+        alert('Incorrect password.');
+    }
+}
+
+function lockAdminPanel() {
+    adminUnlocked = false;
+    var panel = document.getElementById('adminPanel');
+    var btn   = document.getElementById('adminLockBtn');
+    panel.classList.remove('open');
+    btn.textContent = '🔒 Admin';
+    btn.classList.remove('unlocked');
+}
+// ───────────────────────────────────────────────────────────────
+
 function exportData(format = 'csv') {
     if (salesData.length === 0) {
         alert('No data to export');
@@ -974,7 +1007,7 @@ function updateLeaderboard(yearData) {
                 '<div class="lb-rank' + medalClass + '">' + rank + '</div>' +
                 '<div class="lb-info">' +
                     '<div class="lb-name-row">' +
-                        '<button class="lb-name dealer-link" data-dealer="' + escapeAttr(dealer.name) + '" onclick="filterByDealer(this.dataset.dealer)">' + escapeHtml(dealer.name) + '</button>' +
+                        '<button class="lb-name dealer-link" data-dealer="' + escapeAttr(dealer.name) + '" onclick="showDealerDetails(this.dataset.dealer)">' + escapeHtml(dealer.name) + '</button>' +
                         '<span class="lb-pct">' + pct.toFixed(1) + '%</span>' +
                         '<span class="lb-revenue">' + formatCurrency(dealer.revenue) + '</span>' +
                     '</div>' +
@@ -1110,6 +1143,30 @@ function showReportDetails(dateStr) {
     modal.setAttribute('aria-hidden', 'false');
 }
 
+function showDealerDetails(dealerName) {
+    var orders = getDealerYtdOrders(dealerName);
+    if (orders.length === 0) {
+        alert('No order detail available for ' + dealerName + ' in ' + targetYear + '.');
+        return;
+    }
+
+    var modal = document.getElementById('reportModal');
+    var title = document.getElementById('reportModalTitle');
+    title.textContent = 'YTD Transactions — ' + dealerName + ' (' + targetYear + ')';
+
+    reportModalState = {
+        date: null,
+        orders: orders,
+        selectedDealer: dealerName,
+        sortColumn: null,
+        sortDirection: 'asc',
+        fromLeaderboard: true
+    };
+    renderReportModalTable();
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+}
+
 function closeReportModal() {
     const modal = document.getElementById('reportModal');
     modal.classList.remove('open');
@@ -1240,8 +1297,9 @@ function renderReportModalTable() {
             var selected = name === selectedDealer ? ' selected' : '';
             html += '<option value=\"' + escapeAttr(name) + '\"' + selected + '>' + escapeHtml(name) + '</option>';
         });
+        var backLabel = reportModalState.fromLeaderboard ? 'Close' : 'Back to day view';
         html += '</select>' +
-            '<button type=\"button\" class=\"details-btn\" id=\"clearDealerFilterBtn\">Back to day view</button></div>';
+            '<button type=\"button\" class=\"details-btn\" id=\"clearDealerFilterBtn\">' + backLabel + '</button></div>';
     }
 
     var sortCol = reportModalState.sortColumn;
@@ -1280,7 +1338,11 @@ function renderReportModalTable() {
     const clearBtn = document.getElementById('clearDealerFilterBtn');
     if (clearBtn) {
         clearBtn.addEventListener('click', function() {
-            clearDealerFilter();
+            if (reportModalState && reportModalState.fromLeaderboard) {
+                closeReportModal();
+            } else {
+                clearDealerFilter();
+            }
         });
     }
 

@@ -289,6 +289,62 @@ button:active {
     color: var(--card-dark);
 }
 
+.admin-lock-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 28px;
+    font-size: 0.8em;
+    padding: 8px 18px;
+    background: var(--card-dark);
+    color: #F5F0EA;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    z-index: 900;
+    transition: background 0.15s, box-shadow 0.15s;
+}
+
+.admin-lock-btn:hover {
+    background: #1A1714;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+    transform: none;
+}
+
+.admin-lock-btn.unlocked {
+    background: var(--success);
+    transform: none;
+    box-shadow: 0 4px 14px rgba(45,122,79,0.35);
+}
+
+.admin-panel {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.45s ease, opacity 0.3s ease, padding 0.3s ease;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+
+.admin-panel.open {
+    max-height: 900px;
+    opacity: 1;
+    padding: 24px 24px 80px;
+}
+
+.admin-action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 16px 0 8px;
+    border-top: 1px solid var(--line);
+    margin-top: 4px;
+}
+
 .trend-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

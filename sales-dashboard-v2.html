@@ -84,11 +84,6 @@
             </div>
         </div>
 
-        <div class="leaderboard-section">
-            <h2>Dealer Leaderboard <span class="leaderboard-year" id="leaderboardYear"></span></h2>
-            <div id="leaderboardList"><p class="no-data">No dealer data yet.</p></div>
-        </div>
-
         <div class="charts-grid">
             <div class="chart-container">
                 <h2 class="chart-title">Daily Sales</h2>
@@ -101,13 +96,13 @@
         </div>
         </div>
 
+        <div class="leaderboard-section">
+            <h2>Dealer Leaderboard <span class="leaderboard-year" id="leaderboardYear"></span></h2>
+            <div id="leaderboardList"><p class="no-data">No dealer data yet.</p></div>
+        </div>
+
         <div class="data-table-section">
             <h2>Sales History</h2>
-            <button onclick="clearAllData()" class="clear-btn">Clear All Data</button>
-            <button onclick="exportData('csv')" class="export-btn">Export CSV</button>
-            <button onclick="exportData('excel')" class="export-btn">Export Excel</button>
-            <button onclick="createSnapshot()" class="export-btn">Create Snapshot</button>
-            <button onclick="publishSharedData()" class="publish-btn">Publish for Team</button>
             <table id="salesTable">
                 <thead>
                     <tr>
@@ -126,6 +121,9 @@
             </table>
         </div>
 
+    </div>
+
+    <div class="admin-panel" id="adminPanel">
         <div class="controls">
             <div class="goal-section">
                 <label for="salesGoal">Annual Goal ($):</label>
@@ -134,14 +132,12 @@
                 <input type="number" id="targetYear" placeholder="YYYY">
                 <button onclick="updateGoal()">Save Goal</button>
             </div>
-
             <div class="upload-section">
                 <label for="dailySales">Add Daily Sales ($):</label>
                 <input type="date" id="salesDate">
                 <input type="number" id="dailySales" placeholder="Enter sales amount">
                 <button onclick="addSales()">Add Sales</button>
             </div>
-
             <div class="file-upload-section">
                 <label>Upload Daily Reports:</label>
                 <div class="drop-zone" id="dropZone">
@@ -153,7 +149,16 @@
                 <small>Supports Savant daily reports and standard date/amount CSV or Excel files.</small>
             </div>
         </div>
+        <div class="admin-action-buttons">
+            <button onclick="exportData('csv')" class="export-btn">Export CSV</button>
+            <button onclick="exportData('excel')" class="export-btn">Export Excel</button>
+            <button onclick="createSnapshot()" class="export-btn">Create Snapshot</button>
+            <button onclick="publishSharedData()" class="publish-btn">Publish for Team</button>
+            <button onclick="clearAllData()" class="clear-btn">Clear All Data</button>
+        </div>
     </div>
+
+    <button onclick="toggleAdminPanel()" class="admin-lock-btn" id="adminLockBtn">&#128274; Admin</button>
 
     <div class="modal-backdrop" id="reportModal" aria-hidden="true">
         <div class="modal-panel">
