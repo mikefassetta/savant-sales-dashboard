@@ -1,19 +1,18 @@
 :root {
-    --bg-1: #F5F0EA;
-    --bg-2: #EBE3D9;
-    --panel: #FFFDF9;
-    --text: #1A1714;
-    --muted: #8C8278;
-    --line: #DED6CC;
-    --primary: #D97757;
-    --primary-hover: #C4633F;
-    --primary-soft: #E8956F;
-    --card-dark: #2F2925;
-    --card-dark-accent: #3D332C;
-    --accent: #D97757;
-    --danger: #B84233;
-    --success: #2D7A4F;
-    --font-serif: 'Source Serif 4', 'Georgia', 'Times New Roman', serif;
+    --bg-1: #000000;
+    --bg-2: #1C1C1E;
+    --panel: #1C1C1E;
+    --text: #F5F5F7;
+    --muted: #86868B;
+    --line: #38383A;
+    --primary: #0A84FF;
+    --primary-hover: #409CFF;
+    --primary-soft: #0A84FF;
+    --card-dark: #2C2C2E;
+    --card-dark-accent: #2C2C2E;
+    --accent: #0A84FF;
+    --danger: #FF453A;
+    --success: #30D158;
 }
 
 * {
@@ -23,8 +22,8 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: radial-gradient(ellipse at 20% 0%, var(--bg-2) 0%, var(--bg-1) 60%, #F8F4EF 100%);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
+    background: #000000;
     min-height: 100vh;
     padding: 20px;
     color: var(--text);
@@ -35,7 +34,7 @@ body {
     margin: 0 auto;
     background: var(--panel);
     border-radius: 18px;
-    box-shadow: 0 12px 40px rgba(45, 35, 25, 0.08);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
     padding: 32px;
     border: 1px solid var(--line);
 }
@@ -46,27 +45,25 @@ header {
 }
 
 h1 {
-    font-family: var(--font-serif);
-    font-size: 2.3em;
+    font-size: 2.2em;
+    font-weight: 600;
     margin-bottom: 8px;
-    letter-spacing: -0.01em;
-    color: var(--card-dark);
+    letter-spacing: -0.02em;
+    color: var(--text);
 }
 
 h2 {
-    font-family: var(--font-serif);
     letter-spacing: -0.01em;
+    font-weight: 600;
 }
 
 h3 {
-    font-family: var(--font-serif);
+    font-weight: 600;
 }
 
 .subtitle {
-    font-family: var(--font-serif);
     color: var(--muted);
     font-size: 1.05em;
-    font-style: italic;
 }
 
 .snapshot-asof {
@@ -81,7 +78,7 @@ h3 {
 }
 
 .controls {
-    background: #FAF6F1;
+    background: var(--card-dark);
     border: 1px solid var(--line);
     padding: 26px;
     border-radius: 14px;
@@ -119,7 +116,7 @@ input[type="file"] {
     margin-right: 10px;
     margin-bottom: 10px;
     font-family: inherit;
-    background: #fff;
+    background: #2C2C2E;
     color: var(--text);
     transition: border-color 0.2s;
 }
@@ -151,7 +148,7 @@ button {
 button:hover {
     transform: translateY(-1px);
     background: var(--primary-hover);
-    box-shadow: 0 8px 20px rgba(217, 119, 87, 0.25);
+    box-shadow: 0 8px 20px rgba(10, 132, 255, 0.25);
 }
 
 button:active {
@@ -159,11 +156,11 @@ button:active {
 }
 
 .drop-zone {
-    border: 2px dashed #C9BFB3;
+    border: 2px dashed #48484A;
     border-radius: 12px;
     padding: 28px 16px;
     text-align: center;
-    background: #FAF6F1;
+    background: var(--card-dark);
     cursor: pointer;
     transition: all 0.2s;
     position: relative;
@@ -172,7 +169,7 @@ button:active {
 .drop-zone:hover,
 .drop-zone.dragover {
     border-color: var(--primary);
-    background: #F5EEE5;
+    background: #2C2C2E;
 }
 
 .drop-zone input[type="file"] {
@@ -188,7 +185,7 @@ button:active {
 .drop-title {
     font-size: 1.08em;
     font-weight: 600;
-    color: var(--card-dark);
+    color: var(--text);
 }
 
 .drop-subtitle {
@@ -206,10 +203,10 @@ button:active {
 
 .stat-card {
     background: var(--card-dark);
-    color: #F5F0EA;
+    color: var(--text);
     padding: 20px;
     border-radius: 13px;
-    box-shadow: 0 6px 18px rgba(45, 35, 25, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .kpi-card {
@@ -225,7 +222,7 @@ button:active {
 }
 
 .kpi-card.drop-target {
-    outline: 2px dashed var(--primary-soft);
+    outline: 2px dashed var(--primary);
     outline-offset: -8px;
 }
 
@@ -239,18 +236,17 @@ button:active {
     opacity: 0.8;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #C9BFB3;
+    color: #86868B;
 }
 
 .stat-value {
-    font-family: var(--font-serif);
     font-size: 1.85em;
     font-weight: 700;
-    color: #FFFDF9;
+    color: #F5F5F7;
 }
 
 .progress-bar-container {
-    background: var(--bg-2);
+    background: var(--card-dark);
     height: 46px;
     border-radius: 999px;
     overflow: hidden;
@@ -261,7 +257,7 @@ button:active {
 
 .progress-bar {
     height: 100%;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-soft) 100%);
+    background: linear-gradient(135deg, #0A84FF 0%, #409CFF 100%);
     width: 0%;
     transition: width 0.45s ease;
     display: flex;
@@ -274,7 +270,6 @@ button:active {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    font-family: var(--font-serif);
     color: var(--text);
     font-weight: 700;
 }
@@ -286,7 +281,7 @@ button:active {
 .trend-section h2,
 .data-table-section h2 {
     margin-bottom: 16px;
-    color: var(--card-dark);
+    color: var(--text);
 }
 
 .admin-lock-btn {
@@ -296,27 +291,29 @@ button:active {
     font-size: 0.8em;
     padding: 8px 18px;
     background: var(--card-dark);
-    color: #F5F0EA;
-    border: none;
+    color: var(--text);
+    border: 1px solid var(--line);
     border-radius: 20px;
     cursor: pointer;
     font-weight: 500;
     letter-spacing: 0.04em;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
     z-index: 900;
     transition: background 0.15s, box-shadow 0.15s;
 }
 
 .admin-lock-btn:hover {
-    background: #1A1714;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+    background: #3A3A3C;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
     transform: none;
 }
 
 .admin-lock-btn.unlocked {
     background: var(--success);
+    color: #000;
     transform: none;
-    box-shadow: 0 4px 14px rgba(45,122,79,0.35);
+    box-shadow: 0 4px 14px rgba(48, 209, 88, 0.3);
+    border-color: transparent;
 }
 
 .admin-panel {
@@ -352,7 +349,7 @@ button:active {
 }
 
 .trend-card {
-    background: #FAF6F1;
+    background: var(--card-dark);
     border: 1px solid var(--line);
     padding: 16px;
     border-radius: 10px;
@@ -368,7 +365,6 @@ button:active {
 }
 
 .trend-value {
-    font-family: var(--font-serif);
     font-size: 1.35em;
     font-weight: 700;
     color: var(--text);
@@ -381,11 +377,10 @@ button:active {
 
 .leaderboard-section h2 {
     margin-bottom: 16px;
-    color: var(--card-dark);
+    color: var(--text);
 }
 
 .leaderboard-year {
-    font-family: 'Inter', sans-serif;
     font-size: 0.6em;
     font-weight: 400;
     color: var(--muted);
@@ -398,14 +393,13 @@ button:active {
     align-items: center;
     gap: 12px;
     padding: 10px 14px;
-    background: #FAF6F1;
+    background: var(--card-dark);
     border: 1px solid var(--line);
     border-radius: 8px;
     margin-bottom: 6px;
 }
 
 .lb-rank {
-    font-family: var(--font-serif);
     font-size: 1.1em;
     font-weight: 700;
     color: var(--muted);
@@ -414,9 +408,9 @@ button:active {
     flex-shrink: 0;
 }
 
-.lb-rank.rank-gold   { color: #B8892A; }
-.lb-rank.rank-silver { color: #8A9199; }
-.lb-rank.rank-bronze { color: #9C6140; }
+.lb-rank.rank-gold   { color: #FFD60A; }
+.lb-rank.rank-silver { color: #98989D; }
+.lb-rank.rank-bronze { color: #AC8E68; }
 
 .lb-info {
     flex: 1;
@@ -460,7 +454,6 @@ button:active {
 }
 
 .lb-revenue {
-    font-family: var(--font-serif);
     font-size: 0.95em;
     font-weight: 600;
     color: var(--text);
@@ -490,7 +483,7 @@ button:active {
 }
 
 .chart-container {
-    background: #FAF6F1;
+    background: var(--card-dark);
     border: 1px solid var(--line);
     padding: 18px;
     border-radius: 12px;
@@ -499,7 +492,75 @@ button:active {
 .chart-title {
     font-size: 1em;
     margin-bottom: 10px;
-    color: var(--card-dark);
+    color: var(--text);
+}
+
+.github-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--card-dark);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+}
+
+.github-section label {
+    font-weight: 600;
+    font-size: 0.85em;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 6px;
+}
+
+.github-section small {
+    display: block;
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 0.75em;
+    line-height: 1.4;
+}
+
+.github-token-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.github-token-row input {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: #1C1C1E;
+    color: var(--text);
+    font-size: 0.9em;
+}
+
+.github-token-row button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.github-token-row button:hover {
+    background: var(--primary-hover);
+}
+
+.github-status {
+    font-size: 0.8em;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.github-status.success {
+    color: var(--success);
+}
+
+.github-status.error {
+    color: var(--danger);
 }
 
 .clear-btn,
@@ -511,20 +572,21 @@ button:active {
 
 .publish-btn {
     background: var(--success);
+    color: #000;
 }
 
 .publish-btn:hover {
-    background: #246B42;
-    box-shadow: 0 8px 16px rgba(45, 122, 79, 0.25);
+    background: #28A745;
+    box-shadow: 0 8px 16px rgba(48, 209, 88, 0.25);
 }
 
 .clear-btn {
-    background: var(--card-dark);
+    background: var(--card-dark-accent);
 }
 
 .clear-btn:hover {
-    background: #3D332C;
-    box-shadow: 0 8px 16px rgba(45, 35, 25, 0.2);
+    background: #48484A;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 .export-btn {
@@ -534,7 +596,7 @@ button:active {
 table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
+    background: var(--panel);
     border-radius: 10px;
     overflow: hidden;
     border: 1px solid var(--line);
@@ -542,7 +604,7 @@ table {
 
 thead {
     background: var(--card-dark);
-    color: #F5F0EA;
+    color: var(--text);
 }
 
 th,
@@ -552,11 +614,11 @@ td {
 }
 
 tbody tr:nth-child(even) {
-    background: #FAF6F1;
+    background: rgba(255, 255, 255, 0.03);
 }
 
 tbody tr:hover {
-    background: #F2EAE0;
+    background: rgba(255, 255, 255, 0.06);
 }
 
 .no-data {
@@ -566,14 +628,14 @@ tbody tr:hover {
 }
 
 .month-header {
-    background: var(--bg-2) !important;
+    background: var(--card-dark) !important;
     cursor: pointer;
     user-select: none;
     border-top: 2px solid var(--line);
 }
 
 .month-header:hover {
-    background: #DDD5C8 !important;
+    background: #3A3A3C !important;
 }
 
 .month-header td {
@@ -583,7 +645,6 @@ tbody tr:hover {
 }
 
 .month-header .month-total {
-    font-family: var(--font-serif);
     font-size: 1.05em;
     color: var(--primary);
 }
@@ -616,14 +677,26 @@ tbody tr:hover {
 }
 
 .delete-btn {
-    background: var(--danger);
-    padding: 6px 12px;
-    font-size: 0.86em;
+    background: none;
+    border: none;
+    padding: 2px 6px;
+    font-size: 0.75em;
+    color: var(--muted);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s, color 0.15s;
+}
+
+tr:hover .delete-btn {
+    opacity: 1;
 }
 
 .delete-btn:hover {
-    background: #9A3529;
-    box-shadow: 0 6px 14px rgba(184, 66, 51, 0.25);
+    color: var(--danger);
+    background: none;
+    box-shadow: none;
+    transform: none;
+    text-decoration: underline;
 }
 
 .details-btn {
@@ -657,7 +730,7 @@ small {
 .modal-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(30, 25, 20, 0.5);
+    background: rgba(0, 0, 0, 0.6);
     display: none;
     align-items: center;
     justify-content: center;
@@ -678,7 +751,7 @@ small {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 20px 50px rgba(30, 25, 20, 0.2);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
 
 .modal-header {
@@ -687,8 +760,7 @@ small {
     align-items: center;
     padding: 14px 16px;
     border-bottom: 1px solid var(--line);
-    background: #FAF6F1;
-    font-family: var(--font-serif);
+    background: var(--card-dark);
 }
 
 .modal-close {
@@ -763,8 +835,8 @@ small {
 }
 
 .modal-table th {
-    background: var(--card-dark);
-    color: #F5F0EA;
+    background: var(--card-dark-accent);
+    color: var(--text);
 }
 
 .sortable-th {
@@ -773,7 +845,7 @@ small {
 }
 
 .sortable-th:hover {
-    background: var(--card-dark-accent);
+    background: #48484A;
 }
 
 .dealer-select-label {
@@ -788,7 +860,7 @@ small {
     border-radius: 9px;
     font-size: 0.9em;
     font-family: inherit;
-    background: #fff;
+    background: var(--card-dark);
     margin-right: 10px;
     cursor: pointer;
     color: var(--text);

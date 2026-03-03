@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     DOM.targetYear.value = targetYear;
     setupKpiDragAndDrop();
     setupFileUpload();
+    initGitHubToken();
 
     var hasLocalData = salesData.length > 0;
     if (!hasLocalData) {
@@ -243,6 +244,10 @@ function addSales() {
 }
 
 function deleteSales(index) {
+    if (!adminUnlocked) {
+        alert('Unlock Admin to delete entries.');
+        return;
+    }
     if (confirm('Are you sure you want to delete this entry?')) {
         salesData.splice(index, 1);
         localStorage.setItem('salesData', JSON.stringify(salesData));
@@ -584,7 +589,7 @@ function createSnapshot() {
     }
 
     html2canvas(container, {
-        backgroundColor: '#F5F0EA',
+        backgroundColor: '#000000',
         scale: 2,
         useCORS: true,
         logging: false
@@ -704,29 +709,115 @@ function loadSharedData() {
         });
 }
 
-function publishSharedData() {
+var GITHUB_REPO = 'mikefassetta/savant-sales-dashboard';
+
+function saveGitHubToken() {
+    var token = document.getElementById('githubToken').value.trim();
+    if (!token) { alert('Enter a token first'); return; }
+    localStorage.setItem('githubToken', token);
+    updateGitHubStatus('Saved', 'success');
+}
+
+function getGitHubToken() {
+    return localStorage.getItem('githubToken') || '';
+}
+
+function updateGitHubStatus(msg, type) {
+    var el = document.getElementById('githubStatus');
+    el.textContent = msg;
+    el.className = 'github-status ' + (type || '');
+    if (type === 'success') setTimeout(function() { el.textContent = ''; el.className = 'github-status'; }, 3000);
+}
+
+function initGitHubToken() {
+    var saved = getGitHubToken();
+    if (saved) {
+        document.getElementById('githubToken').value = saved;
+    }
+}
+
+async function pushFileToGitHub(path, content, message) {
+    var token = getGitHubToken();
+    if (!token) throw new Error('No GitHub token. Add one in the admin panel.');
+
+    var apiUrl = 'https://api.github.com/repos/' + GITHUB_REPO + '/contents/' + path;
+
+    // Get current file SHA (needed for updates)
+    var sha = null;
+    try {
+        var getResp = await fetch(apiUrl, {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (getResp.ok) {
+            var existing = await getResp.json();
+            sha = existing.sha;
+        }
+    } catch (e) { /* file doesn't exist yet, that's fine */ }
+
+    var body = {
+        message: message,
+        content: btoa(unescape(encodeURIComponent(content)))
+    };
+    if (sha) body.sha = sha;
+
+    var putResp = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    });
+
+    if (!putResp.ok) {
+        var err = await putResp.json();
+        throw new Error(err.message || 'GitHub API error ' + putResp.status);
+    }
+
+    return await putResp.json();
+}
+
+async function publishSharedData() {
     if (salesData.length === 0) {
         alert('No data to publish');
         return;
     }
 
-    var payload = {
-        salesData: salesData,
-        salesGoal: salesGoal,
-        targetYear: targetYear,
-        publishedAt: new Date().toISOString()
-    };
+    var token = getGitHubToken();
+    if (!token) {
+        alert('Add your GitHub token in the admin panel first.');
+        return;
+    }
 
-    var json = JSON.stringify(payload, null, 2);
-    var blob = new Blob([json], { type: 'application/json' });
-    var url = window.URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = 'shared-data.json';
-    a.click();
-    window.URL.revokeObjectURL(url);
+    var btn = document.getElementById('publishBtn');
+    var origText = btn.textContent;
+    btn.textContent = 'Publishing...';
+    btn.disabled = true;
+    updateGitHubStatus('Publishing...', '');
 
-    alert('shared-data.json downloaded to your Downloads folder!\n\n1. Move it to:\n   Documents > Code projects > Savant dashboard\n\n2. Then in Terminal run:\n   git add shared-data.json && git commit -m "Update sales data" && git push');
+    try {
+        var payload = {
+            salesData: salesData,
+            salesGoal: salesGoal,
+            targetYear: targetYear,
+            publishedAt: new Date().toISOString()
+        };
+
+        var json = JSON.stringify(payload, null, 2);
+        await pushFileToGitHub(
+            'shared-data.json',
+            json,
+            'Update sales data ' + new Date().toISOString().slice(0, 16).replace('T', ' ')
+        );
+
+        updateGitHubStatus('Published! Site updates in ~1 min.', 'success');
+    } catch (e) {
+        updateGitHubStatus('Error: ' + e.message, 'error');
+        alert('Publish failed: ' + e.message);
+    } finally {
+        btn.textContent = origText;
+        btn.disabled = false;
+    }
 }
 
 function clearAllData() {
@@ -813,7 +904,7 @@ function updateTrendAnalysis(dailySeries, totalSales, totalDays, expectedToDate)
     const paceGapEl = document.getElementById('paceGap');
     const absGap = formatCurrency(Math.abs(paceGap));
     paceGapEl.textContent = paceGap >= 0 ? '+' + absGap : '-' + absGap;
-    paceGapEl.style.color = paceGap >= 0 ? '#2D7A4F' : '#B84233';
+    paceGapEl.style.color = paceGap >= 0 ? '#30D158' : '#FF453A';
 }
 
 function updateChart(dailySeries) {
@@ -860,8 +951,8 @@ function updateChart(dailySeries) {
                     label: 'Daily Sales',
                     type: 'bar',
                     data: amounts,
-                    borderColor: '#C4633F',
-                    backgroundColor: 'rgba(217, 119, 87, 0.3)',
+                    borderColor: '#0A84FF',
+                    backgroundColor: 'rgba(10, 132, 255, 0.25)',
                     borderWidth: 1,
                     yAxisID: 'y'
                 }
@@ -877,14 +968,14 @@ function updateChart(dailySeries) {
             plugins: {
                 legend: {
                     display: true,
-                    position: 'top'
+                    position: 'top',
+                    labels: { color: '#F5F5F7' }
                 },
                 title: {
                     display: true,
                     text: 'Daily Sales (' + targetYear + ')',
-                    font: {
-                        size: 16
-                    }
+                    font: { size: 16 },
+                    color: '#F5F5F7'
                 }
             },
             scales: {
@@ -892,10 +983,13 @@ function updateChart(dailySeries) {
                     type: 'linear',
                     display: true,
                     position: 'left',
-                    title: {
-                        display: true,
-                        text: 'Daily Sales ($)'
-                    }
+                    title: { display: true, text: 'Daily Sales ($)', color: '#86868B' },
+                    ticks: { color: '#86868B' },
+                    grid: { color: 'rgba(255, 255, 255, 0.06)' }
+                },
+                x: {
+                    ticks: { color: '#86868B' },
+                    grid: { color: 'rgba(255, 255, 255, 0.06)' }
                 }
             }
         }
@@ -910,8 +1004,8 @@ function updateChart(dailySeries) {
                     label: 'Cumulative Sales',
                     type: 'line',
                     data: cumulativeData,
-                    borderColor: '#D97757',
-                    backgroundColor: 'rgba(217, 119, 87, 0.12)',
+                    borderColor: '#0A84FF',
+                    backgroundColor: 'rgba(10, 132, 255, 0.1)',
                     tension: 0.35,
                     fill: true,
                     yAxisID: 'y'
@@ -920,7 +1014,7 @@ function updateChart(dailySeries) {
                     label: 'YTD Target',
                     type: 'line',
                     data: ytdTargetLine,
-                    borderColor: '#8C8278',
+                    borderColor: '#86868B',
                     borderDash: [8, 5],
                     borderWidth: 2,
                     pointRadius: 0,
@@ -939,14 +1033,14 @@ function updateChart(dailySeries) {
             plugins: {
                 legend: {
                     display: true,
-                    position: 'top'
+                    position: 'top',
+                    labels: { color: '#F5F5F7' }
                 },
                 title: {
                     display: true,
                     text: 'Cumulative vs Pace (' + targetYear + ')',
-                    font: {
-                        size: 16
-                    }
+                    font: { size: 16 },
+                    color: '#F5F5F7'
                 }
             },
             scales: {
@@ -954,10 +1048,13 @@ function updateChart(dailySeries) {
                     type: 'linear',
                     display: true,
                     position: 'left',
-                    title: {
-                        display: true,
-                        text: 'Cumulative Sales ($)'
-                    }
+                    title: { display: true, text: 'Cumulative Sales ($)', color: '#86868B' },
+                    ticks: { color: '#86868B' },
+                    grid: { color: 'rgba(255, 255, 255, 0.06)' }
+                },
+                x: {
+                    ticks: { color: '#86868B' },
+                    grid: { color: 'rgba(255, 255, 255, 0.06)' }
                 }
             }
         }
@@ -1089,8 +1186,8 @@ function updateTable(dailySeries) {
                 '<td class="day-row-date">' + formatDate(entry.date) + '</td>' +
                 '<td>' + formatCurrency(entry.amount) + '</td>' +
                 '<td>' + formatCurrency(cumulativeUpToHere) + '</td>' +
-                '<td>' + actionCell + '</td>' +
                 '<td>' + detailsCell + '</td>' +
+                '<td>' + actionCell + '</td>' +
                 '</tr>';
         });
     });
