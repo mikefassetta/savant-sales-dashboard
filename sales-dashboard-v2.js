@@ -1119,7 +1119,7 @@ function updateLeaderboard(yearData) {
         return;
     }
 
-    const top10 = dealers.slice(0, 10);
+    const top10 = dealers.slice(0, 5);
     const grandTotal = dealers.reduce(function(sum, d) { return sum + d.revenue; }, 0);
     const maxRevenue = top10[0].revenue;
 
