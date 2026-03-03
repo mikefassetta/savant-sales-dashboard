@@ -5,6 +5,7 @@ let dailyChart = null;
 let trackingChart = null;
 let reportModalState = null;
 const KPI_ORDER_STORAGE_KEY = 'salesDashboardKpiOrderV2';
+const PUBLISHED_AT_KEY = 'salesDashboardPublishedAt';
 let draggingKpiKey = null;
 
 const DOM = {
@@ -25,14 +26,14 @@ document.addEventListener('DOMContentLoaded', function() {
     setupFileUpload();
     initGitHubToken();
 
-    var hasLocalData = salesData.length > 0;
-    if (!hasLocalData) {
-        loadSharedData().then(function() {
-            updateDashboard();
-        });
-    } else {
+    if (salesData.length > 0) {
         updateDashboard();
     }
+    loadSharedData().then(function(wasUpdated) {
+        if (wasUpdated || salesData.length === 0) {
+            updateDashboard();
+        }
+    });
 });
 
 function setupKpiDragAndDrop() {
@@ -681,14 +682,18 @@ function exportData(format = 'csv') {
 }
 
 function loadSharedData() {
-    return fetch('shared-data.json')
+    var url = 'https://raw.githubusercontent.com/mikefassetta/savant-sales-dashboard/main/shared-data.json?t=' + Date.now();
+    return fetch(url)
         .then(function(response) {
-            if (!response.ok) {
-                throw new Error('No shared data file');
-            }
+            if (!response.ok) throw new Error('No shared data file');
             return response.json();
         })
         .then(function(data) {
+            var storedPublishedAt = localStorage.getItem(PUBLISHED_AT_KEY) || '';
+            var serverPublishedAt = data.publishedAt || '';
+            if (serverPublishedAt && serverPublishedAt <= storedPublishedAt && salesData.length > 0) {
+                return false;
+            }
             if (Array.isArray(data.salesData) && data.salesData.length > 0) {
                 salesData = data.salesData;
                 localStorage.setItem('salesData', JSON.stringify(salesData));
@@ -703,9 +708,13 @@ function loadSharedData() {
                 localStorage.setItem('targetYear', targetYear);
                 DOM.targetYear.value = targetYear;
             }
+            if (serverPublishedAt) {
+                localStorage.setItem(PUBLISHED_AT_KEY, serverPublishedAt);
+            }
+            return true;
         })
         .catch(function() {
-            // No shared data file — that's fine, use empty state
+            return false;
         });
 }
 
@@ -777,6 +786,27 @@ async function pushFileToGitHub(path, content, message) {
     return await putResp.json();
 }
 
+function saveDataFile() {
+    if (salesData.length === 0) {
+        alert('No data to save.');
+        return;
+    }
+    var payload = {
+        salesData: salesData,
+        salesGoal: salesGoal,
+        targetYear: targetYear,
+        publishedAt: new Date().toISOString()
+    };
+    var json = JSON.stringify(payload, null, 2);
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'shared-data.json';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
 async function publishSharedData() {
     if (salesData.length === 0) {
         alert('No data to publish');
@@ -810,6 +840,7 @@ async function publishSharedData() {
             'Update sales data ' + new Date().toISOString().slice(0, 16).replace('T', ' ')
         );
 
+        localStorage.setItem(PUBLISHED_AT_KEY, payload.publishedAt);
         updateGitHubStatus('Published! Site updates in ~1 min.', 'success');
     } catch (e) {
         updateGitHubStatus('Error: ' + e.message, 'error');
