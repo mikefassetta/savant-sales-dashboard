@@ -935,7 +935,7 @@ function updateTrendAnalysis(dailySeries, totalSales, totalDays, expectedToDate)
     const paceGapEl = document.getElementById('paceGap');
     const absGap = formatCurrency(Math.abs(paceGap));
     paceGapEl.textContent = paceGap >= 0 ? '+' + absGap : '-' + absGap;
-    paceGapEl.style.color = paceGap >= 0 ? '#30D158' : '#FF453A';
+    paceGapEl.style.color = paceGap >= 0 ? '#00FF41' : '#FF3333';
 }
 
 function updateChart(dailySeries) {
@@ -982,8 +982,8 @@ function updateChart(dailySeries) {
                     label: 'Daily Sales',
                     type: 'bar',
                     data: amounts,
-                    borderColor: '#0A84FF',
-                    backgroundColor: 'rgba(10, 132, 255, 0.25)',
+                    borderColor: '#00CC00',
+                    backgroundColor: 'rgba(0, 204, 0, 0.35)',
                     borderWidth: 1,
                     yAxisID: 'y'
                 }
@@ -1000,13 +1000,13 @@ function updateChart(dailySeries) {
                 legend: {
                     display: true,
                     position: 'top',
-                    labels: { color: '#F5F5F7' }
+                    labels: { color: '#CCCCCC', font: { family: "'JetBrains Mono', monospace", size: 10 } }
                 },
                 title: {
                     display: true,
-                    text: 'Daily Sales (' + targetYear + ')',
-                    font: { size: 16 },
-                    color: '#F5F5F7'
+                    text: 'DAILY SALES (' + targetYear + ')',
+                    font: { size: 11, family: "'JetBrains Mono', monospace", weight: 700 },
+                    color: '#FF8C00'
                 }
             },
             scales: {
@@ -1014,13 +1014,13 @@ function updateChart(dailySeries) {
                     type: 'linear',
                     display: true,
                     position: 'left',
-                    title: { display: true, text: 'Daily Sales ($)', color: '#86868B' },
-                    ticks: { color: '#86868B' },
-                    grid: { color: 'rgba(255, 255, 255, 0.06)' }
+                    title: { display: true, text: 'DAILY SALES ($)', color: '#777777', font: { family: "'JetBrains Mono', monospace", size: 10 } },
+                    ticks: { color: '#777777', font: { family: "'JetBrains Mono', monospace", size: 10 } },
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' }
                 },
                 x: {
-                    ticks: { color: '#86868B' },
-                    grid: { color: 'rgba(255, 255, 255, 0.06)' }
+                    ticks: { color: '#777777', font: { family: "'JetBrains Mono', monospace", size: 9 } },
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' }
                 }
             }
         }
@@ -1035,18 +1035,20 @@ function updateChart(dailySeries) {
                     label: 'Cumulative Sales',
                     type: 'line',
                     data: cumulativeData,
-                    borderColor: '#0A84FF',
-                    backgroundColor: 'rgba(10, 132, 255, 0.1)',
+                    borderColor: '#00FF41',
+                    backgroundColor: 'rgba(0, 255, 65, 0.08)',
                     tension: 0.35,
                     fill: true,
+                    borderWidth: 2,
+                    pointRadius: 0,
                     yAxisID: 'y'
                 },
                 {
                     label: 'YTD Target',
                     type: 'line',
                     data: ytdTargetLine,
-                    borderColor: '#86868B',
-                    borderDash: [8, 5],
+                    borderColor: '#FF8C00',
+                    borderDash: [6, 4],
                     borderWidth: 2,
                     pointRadius: 0,
                     fill: false,
@@ -1065,13 +1067,13 @@ function updateChart(dailySeries) {
                 legend: {
                     display: true,
                     position: 'top',
-                    labels: { color: '#F5F5F7' }
+                    labels: { color: '#CCCCCC', font: { family: "'JetBrains Mono', monospace", size: 10 } }
                 },
                 title: {
                     display: true,
-                    text: 'Cumulative vs Pace (' + targetYear + ')',
-                    font: { size: 16 },
-                    color: '#F5F5F7'
+                    text: 'CUMULATIVE VS PACE (' + targetYear + ')',
+                    font: { size: 11, family: "'JetBrains Mono', monospace", weight: 700 },
+                    color: '#FF8C00'
                 }
             },
             scales: {
@@ -1079,13 +1081,13 @@ function updateChart(dailySeries) {
                     type: 'linear',
                     display: true,
                     position: 'left',
-                    title: { display: true, text: 'Cumulative Sales ($)', color: '#86868B' },
-                    ticks: { color: '#86868B' },
-                    grid: { color: 'rgba(255, 255, 255, 0.06)' }
+                    title: { display: true, text: 'CUMULATIVE SALES ($)', color: '#777777', font: { family: "'JetBrains Mono', monospace", size: 10 } },
+                    ticks: { color: '#777777', font: { family: "'JetBrains Mono', monospace", size: 10 } },
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' }
                 },
                 x: {
-                    ticks: { color: '#86868B' },
-                    grid: { color: 'rgba(255, 255, 255, 0.06)' }
+                    ticks: { color: '#777777', font: { family: "'JetBrains Mono', monospace", size: 9 } },
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' }
                 }
             }
         }
